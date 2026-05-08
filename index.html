@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Werkzeug-Mission 2.7.7</title>
+
+<style>
+
+html,body{
+margin:0;
+padding:0;
+height:100%;
+overflow:hidden;
+touch-action:none;
+font-family:Arial,sans-serif;
+background:#1e1e1e;
+color:white;
+}
+
+/* APP */
+.app{
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+
+/* HEADER */
+header{
+background:#222;
+padding:8px;
+text-align:center;
+border-bottom:1px solid #444;
+}
+
+header h1{
+margin:0;
+font-size:20px;
+}
+
+.version{
+font-size:11px;
+color:#aaa;
+margin-top:2px;
+}
+
+/* PROGRESS */
+.progressWrap{
+background:#111;
+padding:6px 10px;
+}
+
+.progressText{
+font-size:12px;
+margin-bottom:4px;
+color:#00c853;
+}
+
+.progressBar{
+width:100%;
+height:10px;
+background:#333;
+border-radius:10px;
+overflow:hidden;
+}
+
+.progressFill{
+height:100%;
+width:0%;
+background:#00c853;
+transition:0.3s;
+}
+
+/* TOP INFO */
+.topInfo{
+display:flex;
+justify-content:space-between;
+padding:8px 10px;
+background:#ff8800;
+color:black;
+font-weight:bold;
+font-size:13px;
+}
+
+/* MENU */
+.menu{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+padding:10px;
+}
+
+.menu button{
+padding:10px;
+border:none;
+border-radius:10px;
+background:#333;
+color:white;
+font-size:14px;
+}
+
+/* MAIN */
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+/* CARD WRAP */
+.cardWrap{
+padding:0 10px;
+}
+
+/* CARD */
+.scene{
+perspective:1000px;
+}
+
+.card{
+position:relative;
+width:100%;
+height:290px;
+transform-style:preserve-3d;
+transition:transform 0.5s;
+}
+
+.card.flip{
+transform:rotateY(180deg);
+}
+
+.face{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+background:#2b2b2b;
+border-radius:16px;
+padding:16px;
+box-sizing:border-box;
+box-shadow:0 0 12px rgba(0,0,0,0.4);
+overflow:hidden;
+}
+
+.back{
+transform:rotateY(180deg);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+}
+
+/* CARD INFO */
+.cardInfo{
+display:flex;
+justify-content:space-between;
+font-size:12px;
+color:#00c853;
+margin-bottom:10px;
+font-weight:bold;
+}
+
+/* QUESTION */
+.question{
+font-size:15px;
+line-height:1.5;
+margin-bottom:18px;
+}
+
+/* ANSWERS */
+.answer{
+width:100%;
+padding:10px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+background:#444;
+color:white;
+font-size:14px;
+}
+
+/* POINTS */
+.pointBar{
+margin-top:14px;
+font-size:14px;
+color:#00c853;
+font-weight:bold;
+}
+
+/* CONTROLS */
+.controls{
+display:flex;
+justify-content:space-between;
+gap:8px;
+padding:12px 10px 8px 10px;
+}
+
+.controls button{
+flex:1;
+padding:11px;
+border:none;
+border-radius:10px;
+background:#ff8800;
+font-weight:bold;
+font-size:13px;
+}
+
+/* FOOTER */
+footer{
+padding:10px;
+text-align:center;
+font-size:11px;
+color:#ff8800;
+border-top:1px solid #333;
+}
+
+/* TOOL RAIN */
+.tool{
+position:fixed;
+top:-30px;
+font-size:24px;
+animation:fall linear forwards;
+pointer-events:none;
+z-index:9999;
+}
+
+@keyframes fall{
+to{
+transform:translateY(110vh) rotate(360deg);
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+<h1>🔧 Werkzeug-Mission - Premium</h1>
+<div class="version">Version 2.7.7</div>
+</header>
+
+<!-- PROGRESS -->
+<div class="progressWrap">
+
+<div class="progressText">
+Fortschritt:
+<span id="percent">0%</span>
+</div>
+
+<div class="progressBar">
+<div class="progressFill" id="bar"></div>
+</div>
+
+</div>
+
+<!-- TOP -->
+<div class="topInfo">
+<div id="rubrikTop">⚡ Elektrik</div>
+<div>
+⭐ Level <span id="lvl">1</span>
+</div>
+</div>
+
+<!-- MENU -->
+<div class="menu">
+<button onclick="setCat(0)">⚡ Elektrik</button>
+<button onclick="setCat(1)">🚿 Sanitär</button>
+<button onclick="setCat(2)">🌿 Garten</button>
+<button onclick="setCat(3)">☀️ Solar</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="cardWrap">
+
+<div class="scene">
+
+<div class="card" id="card" onclick="nextCard()">
+
+<!-- FRONT -->
+<div class="face front">
+
+<div class="cardInfo">
+<div id="cardRubrik">⚡ Elektrik</div>
+<div id="count">1 / 16</div>
+</div>
+
+<div class="question" id="q"></div>
+
+<button class="answer" id="a0" onclick="check(0,event)"></button>
+
+<button class="answer" id="a1" onclick="check(1,event)"></button>
+
+<button class="answer" id="a2" onclick="check(2,event)"></button>
+
+<div class="pointBar">
+🧰 Punkte:
+<span id="points">0</span>
+</div>
+
+</div>
+
+<!-- BACK -->
+<div class="face back">
+🔄
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+
+<button onclick="prev()">
+◀ Zurück
+</button>
+
+<button onclick="speak()">
+🔊 Vorlesen
+</button>
+
+<button onclick="next()">
+▶ Weiter
+</button>
+
+<button onclick="resetGame()">
+⌂ Start
+</button>
+
+</div>
+
+</div>
+
+<footer>
+(c) 2026 Premium-App für Uwe Radcke kreiert von Katharina 
+</footer>
+
+</div>
+
+<script>
+
+const cats=[
+"⚡ Elektrik",
+"🚿 Sanitär",
+"🌿 Garten",
+"☀️ Solar"
+];
+
+let cat=0;
+let i=0;
+let points=0;
+let total=16;
+let toolRain=false;
+
+
+const data=[
+
+/* ELEKTRIK */
+[
+["Welche Farbe hat der Schutzleiter in einer Elektroinstallation?","A: Rot","B: Grün-Gelb","C: Blau",1],
+
+["Wofür dient eine Sicherung im Stromkreis?","A: Zum Beleuchten","B: Zum Schutz vor Überlast","C: Zum Dekorieren",1],
+
+["Welche Einheit misst elektrische Spannung?","A: Ampere","B: Watt","C: Volt",2],
+
+["Was passiert beim Betätigen eines Lichtschalters?","A: Die Heizung startet","B: Wasser fließt","C: Der Stromkreis wird unterbrochen",2]
+],
+
+/* SANITÄR */
+[
+["Wofür verwendet man Teflonband bei Wasserleitungen?","A: Zum Streichen","B: Zum Abdichten","C: Zum Bohren",1],
+
+["Womit entfernt man Kalk an Armaturen am besten?","A: Mit Sand","B: Mit Öl","C: Mit Entkalker",2],
+
+["Welche Aufgabe hat ein Wasserhahn?","A: Luft kühlen","B: Wasser regulieren","C: Strom erzeugen",1],
+
+["Welches Material wird oft für Wasserleitungen verwendet?","A: Glas","B: Kupfer","C: Holz",1]
+],
+
+/* GARTEN */
+[
+["Was benötigen Pflanzen hauptsächlich zum Wachsen?","A: Steine","B: Wasser","C: Benzin",1],
+
+["Wann sollte man Pflanzen bevorzugt gießen?","A: Gar nicht","B: Mittags","C: Morgens oder abends",2],
+
+["Welches Werkzeug nutzt man häufig im Garten?","A: Steckdose","B: Gartenschere","C: Bohrhammer",1],
+
+["Was unterstützt gesundes Rasenwachstum?","A: Dunkelheit","B: Eis","C: Sonnenlicht",2]
+],
+
+/* SOLAR */
+[
+["Welche Energiequelle nutzt eine Solaranlage?","A: Wasser","B: Gas","C: Sonnenlicht",2],
+
+["Was misst ein Thermostat?","A: Lautstärke","B: Temperatur","C: Luftdruck",1],
+
+["Was erzeugt eine Heizung im Haus?","A: Kälte","B: Wärme","C: Wind",1],
+
+["Woher stammt Solarstrom?","A: Aus Erde","B: Von der Sonne","C: Aus Holz",1]
+]
+
+];
+
+
+/* INDEX */
+function index(){
+return cat*4+i;
+}
+
+/* LOAD */
+function load(){
+
+let d=data[cat][i];
+
+document.getElementById("rubrikTop").innerText=cats[cat];
+document.getElementById("cardRubrik").innerText=cats[cat];
+
+document.getElementById("count").innerText=
+(index()+1)+" / "+total;
+
+document.getElementById("q").innerText=d[0];
+
+document.getElementById("a0").innerText=d[1];
+document.getElementById("a1").innerText=d[2];
+document.getElementById("a2").innerText=d[3];
+
+let percent=Math.floor(
+((index()+1)/total)*100
+);
+
+document.getElementById("percent").innerText=
+percent+"%";
+
+document.getElementById("bar").style.width=
+percent+"%";
+
+document.getElementById("lvl").innerText=
+Math.min(10,Math.floor(points/16)+1);
+
+document.getElementById("points").innerText=
+points;
+
+document.getElementById("card").classList.remove("flip");
+
+speak();
+}
+
+/* CATEGORY */
+function setCat(c){
+cat=c;
+i=0;
+load();
+}
+
+/* NEXT */
+function nextCard(){
+
+let c=document.getElementById("card");
+
+c.classList.add("flip");
+
+setTimeout(()=>{
+
+i++;
+
+if(i>=4){
+cat=(cat+1)%4;
+i=0;
+}
+
+load();
+
+},250);
+}
+
+function next(){
+nextCard();
+}
+
+/* PREV */
+function prev(){
+
+i--;
+
+if(i<0){
+cat=(cat+3)%4;
+i=3;
+}
+
+load();
+}
+
+/* ANSWER */
+function check(n,e){
+
+e.stopPropagation();
+
+if(n===data[cat][i][4]){
+points+=10;
+}
+
+if(points>=160){
+win();
+}
+
+nextCard();
+}
+
+/* SPEAK */
+function speak(){
+
+speechSynthesis.cancel();
+
+let u=new SpeechSynthesisUtterance(
+data[cat][i][0]
+);
+
+u.lang="de-DE";
+
+speechSynthesis.speak(u);
+}
+
+/* RESET */
+function resetGame(){
+
+speechSynthesis.cancel();
+
+cat=0;
+i=0;
+points=0;
+
+toolRain=false;
+
+document.querySelectorAll(".tool")
+.forEach(t=>t.remove());
+
+load();
+}
+
+/* TOOL RAIN */
+function win(){
+
+if(toolRain)return;
+
+toolRain=true;
+
+setInterval(()=>{
+
+if(!toolRain)return;
+
+let d=document.createElement("div");
+
+d.className="tool";
+
+d.innerText=
+["🔧","🔩","🪛","🚿","⚡","🧰"]
+[Math.floor(Math.random()*6)];
+
+d.style.left=Math.random()*100+"%";
+
+d.style.animationDuration=
+(2+Math.random()*2)+"s";
+
+document.body.appendChild(d);
+
+setTimeout(()=>d.remove(),4000);
+
+},180);
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>
