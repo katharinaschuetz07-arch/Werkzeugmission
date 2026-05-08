@@ -447,7 +447,7 @@ const data=[
 
 /* INDEX */
 function index(){
-return cat*4+i;
+return cat*8+i;
 }
 
 /* LOAD */
@@ -506,7 +506,7 @@ setTimeout(()=>{
 
 i++;
 
-if(i>=4){
+if(i>=8){
 cat=(cat+1)%4;
 i=0;
 }
@@ -527,7 +527,7 @@ i--;
 
 if(i<0){
 cat=(cat+3)%4;
-i=3;
+i=7;
 }
 
 load();
