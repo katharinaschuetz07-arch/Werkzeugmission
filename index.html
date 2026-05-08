@@ -478,7 +478,7 @@ document.getElementById("bar").style.width=
 percent+"%";
 
 document.getElementById("lvl").innerText=
-Math.min(10,Math.floor(points/16)+1);
+Math.min(10,Math.floor(points/32)+1);
 
 document.getElementById("points").innerText=
 points;
@@ -542,7 +542,7 @@ if(n===data[cat][i][4]){
 points+=10;
 }
 
-if(points>=160){
+if(points>=320){
 win();
 }
 
